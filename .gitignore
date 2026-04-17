@@ -6,8 +6,12 @@ __pycache__/
 venv/
 env/
 sma_env/
-.env/
-.env
+
+# Datasets
+data/raw/
+*.jsonl
+*.json
+*.csv
 
 # VSCode settings
 .vscode/
