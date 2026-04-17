@@ -10,3 +10,7 @@ bearer_token = os.getenv('TWITTER_BEARER_TOKEN')
 
 # Initializing Twitter API Client
 client = tweepy.Client(bearer_token=bearer_token)
+
+query = "music"
+
+# Fetching Tweets
