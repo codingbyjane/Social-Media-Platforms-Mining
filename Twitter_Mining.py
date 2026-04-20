@@ -10,7 +10,7 @@ import re
 import string
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import TweetTokenizer
 from nltk.stem import WordNetLemmatizer
 
 nltk.download('punkt')
@@ -31,6 +31,22 @@ tweets_df = tweets_df[['id_str', 'created_at', 'retweet_count', 'full_text']].co
 # Remove duplicates & Empty Rows
 tweets_df.drop_duplicates(inplace=True)
 tweets_df = tweets_df.dropna(inplace=True)
+
+# Load the English stopword list
+stopword_set = set(stopwords.words('english') + ['rt', 'amp', 'via'])
+
+# Discard negation terms from the stopword list to preserve their meaning in sentiment analysis
+stopword_set.discard('not')
+stopword_set.discard('no')
+
+# Text Precprocessing
+def preprocess(text, tokenizer=TweetTokenizer(), lemmatizer=WordNetLemmatizer(), stopword_set=stopword_set):
+    text = text.lower() # Casefolding
+    text = re.sub(r'[^a-zA-Z\s]', '', text) # Remove special characters, punctuation, and numbers
+    tokens = tokenizer.tokenize(text) # Tokenization
+    tokens = [lemmatizer.lemmatize(token) for token in tokens if token not in stopword_set] # Remove stopwords and lemmatize
+    
+    return tokens
 
 
 # Entity Analysis
