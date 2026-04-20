@@ -16,3 +16,7 @@ print(f"\nFirst row of the dataframe: {tweets_df.iloc[0]}")
 
 # Extract attributes like id, created_at, retweet_count, text from the tweets and create a new dataframe with these attributes
 tweets_subset_df = tweets_df[['id_str', 'created_at', 'retweet_count', 'full_text']]
+
+# Define a function to detect and extract brand mentions in the tweet text
+def get_brand(tweet):
+    casefolded_text = str(tweet['full_text']).lower()
