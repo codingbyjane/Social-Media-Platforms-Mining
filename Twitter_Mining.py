@@ -108,3 +108,19 @@ for user, count in mention_frequency.most_common(10):
 # Define a function to detect and extract brand mentions in the tweet text
 def get_brand(tweet):
     casefolded_text = str(tweet['full_text']).lower()
+
+    brands = []
+
+    if re.search(r'\bnike\b', casefolded_text): # Using word boundaries to avoid partial matches (e.g., "nike" in "nikeair")
+        brands.append('Nike')
+    if re.search(r'\blululemon\b', casefolded_text):
+        brands.append('Lululemon')
+    if re.search(r'\badidas\b', casefolded_text):
+        brands.append('Adidas')
+
+    return brands if brands else ['Other']
+
+tweets_subset_df['brand'] = tweets_subset_df.apply(get_brand, axis=1)
+
+# Display the first 10 rows of the 'full_text' and 'brand' columns to verify the brand detection results
+print(tweets_subset_df[['full_text', 'brand']].head(10))
