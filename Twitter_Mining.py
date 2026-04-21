@@ -26,7 +26,7 @@ tweets_df = pd.read_json("data/raw/nikelululemonadidas_tweets.jsonl", lines=True
 tweets_df.info()
 print(f"\nDisplay the columns in the dataframe:\n{tweets_df.columns}")
 print(f"\nFirst 5 rows of the 'full_text' column:\n{tweets_df['full_text'].head()}")
-print(f"\nFirst row of the dataframe:\n{tweets_df.iloc[0]}")
+print(f"\nFirst row of the dataframe:\n{tweets_df.iloc[0]}\n")
 
 # Extract attributes like id, created_at, retweet_count, text from the tweets and create a new dataframe with these attributes
 tweets_subset_df = tweets_df[['id_str', 'created_at', 'retweet_count', 'full_text']]
@@ -49,7 +49,8 @@ def preprocess(text, tokenizer=TweetTokenizer(), lemmatizer=WordNetLemmatizer(),
     text = re.sub(r"@\w+", "", text) # remove mentions
     text = re.sub(r'[^a-zA-Z#\s]', '', text) # Remove special characters, punctuation, and numbers (but keep hashtags)
     tokens = tokenizer.tokenize(text) # Tokenization
-    tokens = [lemmatizer.lemmatize(token) for token in tokens if token not in stopword_set] # Remove stopwords and lemmatize
+    tokens = [lemmatizer.lemmatize(token) for token in tokens] # Lemmatization
+    tokens = [token for token in tokens if token not in stopword_set] # Remove stopwords
     
     return tokens
 
@@ -70,6 +71,15 @@ for t,x in term_frequency.most_common(10):
 
 
 # Entity Analysis
+hashtag_frequency = Counter()
+
+# Define a hashtag extracting function
+def get_hashtags(entities):
+    if isinstance(entities, dict): # Check for NaN values by verifying whether the 'entities' field is a dictionary
+        hashtags = entities.get('hashtags', [])
+
+        tags = [tag['text'].lower() for tag in hashtags if 'text' in tag]
+        hashtag_frequency.update(tags)
 
 
 
