@@ -20,19 +20,20 @@ nltk.download('wordnet')
 # Visualization & Plotting
 import matplotlib.pyplot as plt
 
+
 tweets_df = pd.read_json("data/raw/nikelululemonadidas_tweets.jsonl", lines=True)
 
 # Display basic info and properties of the dataframe
-tweets_df.info()
-print(f"\nDisplay the columns in the dataframe:\n{tweets_df.columns}")
-print(f"\nFirst 5 rows of the 'full_text' column:\n{tweets_df['full_text'].head()}")
+#tweets_df.info()
+#print(f"\nDisplay the columns in the dataframe:\n{tweets_df.columns}")
+#print(f"\nFirst 5 rows of the 'full_text' column:\n{tweets_df['full_text'].head()}")
 print(f"\nFirst row of the dataframe:\n{tweets_df.iloc[0]}\n")
 
 # Extract attributes like id, created_at, retweet_count, text from the tweets and create a new dataframe with these attributes
-tweets_subset_df = tweets_df[['id_str', 'created_at', 'retweet_count', 'full_text']]
+tweets_subset_df = tweets_df[['id_str', 'created_at', 'retweet_count', 'full_text', 'entities']]
 
 # Remove duplicates & Empty Rows
-tweets_subset_df.drop_duplicates(inplace=True)
+tweets_subset_df.drop_duplicates(subset=['id_str', 'full_text', 'created_at'], inplace=True) # Exclude entities
 tweets_subset_df = tweets_subset_df.dropna()
 
 # Load the English stopword list
@@ -57,6 +58,7 @@ def preprocess(text, tokenizer=TweetTokenizer(), lemmatizer=WordNetLemmatizer(),
 # Apply the preprocessing function to the 'full_text' column of the tweets dataframe and create a new column to store the preprocessed tokens
 tweets_subset_df['tokens'] = tweets_subset_df['full_text'].apply(preprocess)
 
+
 # Term Frequency Analysis
 term_frequency = Counter()
 
@@ -67,7 +69,6 @@ for tokens in tweets_subset_df['tokens']:
 # Display the 10 most common terms and their frequencies
 for t,x in term_frequency.most_common(10):
     print('Term: {} - Frequency: {}'.format(t, x))
-
 
 
 # Entity Analysis
@@ -81,6 +82,18 @@ def get_hashtags(entities):
         tags = [tag['text'].lower() for tag in hashtags if 'text' in tag]
         hashtag_frequency.update(tags)
 
+tweets_subset_df['entities'].apply(get_hashtags)
+
+# Display the 10 most common hashtags and their frequencies
+for tag, count in hashtag_frequency.most_common(10):
+    print(f"Hashtag: #{tag} - Frequency: {count}")
+
+
+# Extract Mentions
+def get_mentions(entities):
+    if isinstance(entities, dict):
+        return [mention['screen_name'].lower() for mention in entities.get('user_mentions', [])]
+    return []
 
 
 
