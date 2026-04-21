@@ -24,9 +24,8 @@ import matplotlib.pyplot as plt
 tweets_df = pd.read_json("data/raw/nikelululemonadidas_tweets.jsonl", lines=True)
 
 # Display basic info and properties of the dataframe
-#tweets_df.info()
-#print(f"\nDisplay the columns in the dataframe:\n{tweets_df.columns}")
-#print(f"\nFirst 5 rows of the 'full_text' column:\n{tweets_df['full_text'].head()}")
+tweets_df.info()
+print(f"\nFirst 5 rows of the 'full_text' column:\n{tweets_df['full_text'].head()}")
 print(f"\nFirst row of the dataframe:\n{tweets_df.iloc[0]}\n")
 
 # Extract attributes like id, created_at, retweet_count, text from the tweets and create a new dataframe with these attributes
@@ -95,6 +94,15 @@ def get_mentions(entities):
         return [mention['screen_name'].lower() for mention in entities.get('user_mentions', [])]
     return []
 
+tweets_subset_df['mentions'] = tweets_subset_df['entities'].apply(get_mentions)
+
+mention_frequency = Counter()
+
+for mentions in tweets_subset_df['mentions']:
+    mention_frequency.update(mentions)
+
+for user, count in mention_frequency.most_common(10):
+    print(f"Mention: @{user} - Frequency: {count}")
 
 
 # Define a function to detect and extract brand mentions in the tweet text
